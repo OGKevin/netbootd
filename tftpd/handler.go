@@ -5,15 +5,16 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
-	mfest "github.com/DSpeichert/netbootd/manifest"
-	"github.com/DSpeichert/netbootd/static"
-	"github.com/Masterminds/sprig"
-	"github.com/pin/tftp"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
 	"text/template"
+
+	mfest "github.com/DSpeichert/netbootd/manifest"
+	"github.com/DSpeichert/netbootd/static"
+	"github.com/Masterminds/sprig"
+	"github.com/pin/tftp"
 )
 
 func (server *Server) tftpReadHandler(filename string, rf io.ReaderFrom) error {
@@ -34,7 +35,7 @@ func (server *Server) tftpReadHandler(filename string, rf io.ReaderFrom) error {
 		return errors.New("no manifest for client: " + raddr.IP.String())
 	}
 
-	if manifest.Ipxe {
+	if manifest.Ipxe.Enabled {
 		f, err := static.Files.Open(filename)
 		if err == nil {
 			n, err := rf.ReadFrom(f.(io.ReadSeeker))

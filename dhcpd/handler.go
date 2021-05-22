@@ -4,10 +4,11 @@ package dhcpd
 
 import (
 	"errors"
+	"net"
+
 	mfest "github.com/DSpeichert/netbootd/manifest"
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"golang.org/x/net/ipv4"
-	"net"
 )
 
 func (server *Server) HandleMsg4(buf []byte, oob *ipv4.ControlMessage, peer net.Addr) {
@@ -130,11 +131,16 @@ func (server *Server) HandleMsg4(buf []byte, oob *ipv4.ControlMessage, peer net.
 
 	if req.IsOptionRequested(dhcpv4.OptionBootfileName) && !manifest.Suspended {
 		// serve iPXE script if user-class is iPXE, or whatever the user chooses if iPXE is disabled
-		if stringSlicesEqual(req.UserClass(), []string{"iPXE"}) || !manifest.Ipxe {
+		if stringSlicesEqual(req.UserClass(), []string{"iPXE"}) || !manifest.Ipxe.Enabled {
 			resp.Options.Update(dhcpv4.OptBootFileName(manifest.BootFilename))
 		} else if len(req.ClientArch()) > 0 && req.ClientArch()[0] > 0 {
 			// likely UEFI (not BIOS)
-			resp.Options.Update(dhcpv4.OptBootFileName("ipxe.efi"))
+			switch manifest.Ipxe.Type {
+			case mfest.RPi4:
+				resp.Options.Update(dhcpv4.OptBootFileName("ipxe_rpi4.efi"))
+			default:
+				resp.Options.Update(dhcpv4.OptBootFileName("ipxe.efi"))
+			}
 			//bootFileSize = 1
 		} else {
 			resp.Options.Update(dhcpv4.OptBootFileName("undionly.kpxe"))

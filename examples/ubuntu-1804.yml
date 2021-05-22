@@ -29,7 +29,10 @@ router:
 ntp:
   - 192.168.17.1
 
-ipxe: true
+ipxe:
+  enabeld: true
+  # 0: defalt, 1: RPi4
+  type: 0
 bootFilename: install.ipxe
 
 mounts:

@@ -23,10 +23,26 @@ type Manifest struct {
 	DNS           []net.IP
 	Router        []net.IP
 	NTP           []net.IP
-	Ipxe          bool
+	Ipxe          Ipxe
 	BootFilename  string `yaml:"bootFilename"`
 	Mounts        []Mount
 	Suspended     bool
+}
+
+type IpxeType int
+
+const (
+	Defalt IpxeType = iota
+	RPi4
+)
+
+type Ipxe struct {
+	Enabled bool
+	Type    IpxeType
+}
+
+func (i IpxeType) String() string {
+	return [...]string{"Default", "RPi4"}[i]
 }
 
 // Mount represents a path exposed via TFTP and HTTP.

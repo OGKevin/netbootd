@@ -3,9 +3,6 @@ package httpd
 import (
 	"bytes"
 	_ "embed"
-	mfest "github.com/DSpeichert/netbootd/manifest"
-	"github.com/DSpeichert/netbootd/static"
-	"github.com/Masterminds/sprig"
 	"io"
 	"net"
 	"net/http"
@@ -14,6 +11,10 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	mfest "github.com/DSpeichert/netbootd/manifest"
+	"github.com/DSpeichert/netbootd/static"
+	"github.com/Masterminds/sprig"
 )
 
 type Handler struct {
@@ -46,7 +47,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if manifest.Ipxe {
+	if manifest.Ipxe.Enabled {
 		f, err := static.Files.Open(strings.TrimLeft(r.URL.Path, "/"))
 		if err == nil {
 			fstat, _ := f.Stat()
